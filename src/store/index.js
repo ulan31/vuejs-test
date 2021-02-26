@@ -1,8 +1,14 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import VuexPersist from 'vuex-persist';
 import api from '@/api';
 
 Vue.use(Vuex);
+
+const vuexLocalStorage = new VuexPersist({
+  key: 'vuex',
+  storage: window.localStorage,
+});
 
 export default new Vuex.Store({
 
@@ -28,14 +34,16 @@ export default new Vuex.Store({
   },
 
   actions: {
-    async load({ commit }, params = {}) {
+    async load({ commit, state }, params = {}) {
       commit('set', { isLoading: true });
 
       try {
+        if (state.isCached === true) return;
         const { data } = await api.getPayments(params);
 
         if (Array.isArray(data)) {
           commit('set', { data });
+          commit('set', { isCached: true });
         }
       } catch (e) {
         // eslint-disable-next-line no-alert
@@ -44,5 +52,11 @@ export default new Vuex.Store({
         commit('set', { isLoading: false });
       }
     },
+    cacheClear({ dispatch, commit }) {
+      commit('set', { isCached: false });
+      dispatch('load');
+    },
   },
+
+  plugins: [vuexLocalStorage.plugin],
 });

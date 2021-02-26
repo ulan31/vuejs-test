@@ -1,4 +1,5 @@
 import axios from 'axios';
+import mocksData from '@/mocks/getPayments';
 
 /**
  * @var {Axios}
@@ -19,7 +20,14 @@ const getPayments = (params = {}) => instance.request({
   params,
 });
 
-export default {
-  instance,
+const requests = {
   getPayments,
 };
+
+const mocks = {
+  getPayments: mocksData,
+};
+
+const api = process.env.NODE_ENV === 'development' ? mocks : requests;
+
+export default api;

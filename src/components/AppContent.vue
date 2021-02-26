@@ -9,13 +9,13 @@
         <h4 class="alert-heading">Data was cached!</h4>
         <p>You can clear cache and load data again.</p>
         <hr/>
-        <button class="btn btn-sm btn-primary mr-auto">
+        <button @click="cacheClear()" class="btn btn-sm btn-primary mr-auto">
           Clear cache
         </button>
       </div>
 
       <data-table
-        :rows="data"
+        :rows="dataForTable"
         :columns="columns"
       />
     </template>
@@ -60,6 +60,13 @@ export default {
       'isCached',
       'data',
     ]),
+    dataForTable() {
+      return this.data.map((item) => {
+        item.date = this.$options.filters.date(item.date);
+        item.amount = this.$options.filters.amount(item.amount);
+        return item;
+      });
+    },
   },
 
   created() {
@@ -69,6 +76,7 @@ export default {
   methods: {
     ...mapActions([
       'load',
+      'cacheClear',
     ]),
   },
 };
